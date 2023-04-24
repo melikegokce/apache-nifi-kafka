@@ -1,5 +1,13 @@
 version: '2'
 services:
+  postgres:
+    image: debezium/example-postgres:1.9
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   zookeeper:
     hostname: zookeeper
     container_name: zookeeper
@@ -22,6 +30,32 @@ services:
       KAFKA_CREATE_TOPICS: "kafka-nifi-src:1:1,kafka-nifi-dst:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+      JVM_OPTS: "-Xms16M -Xmx512M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    ports:
+      - 9000:9000
+    depends_on:
+      - kafka
+  kconnect:
+    image: debezium/connect:1.9
+    ports:
+      - 8083:8083
+    environment:
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      BOOTSTRAP_SERVERS: "kafka:9092"
+    links:
+      - zookeeper
+      - postgres
+    depends_on:
+      - kafka
+      - zookeeper
+      - postgres 
   nifi:
     image: apache/nifi:latest
     ports:
@@ -33,6 +67,7 @@ services:
        NIFI_ZK_CONNECT_STRING: "zookeeper:2181"
        NIFI_ELECTION_MAX_WAIT: "1 min"
        NIFI_ZK_ROOT_NODE: "/nifi"
+       NIFI_SENSITIVE_PROPS_KEY: "Ggokceggokcec"
   producer:
     build: ./producer
     environment:
