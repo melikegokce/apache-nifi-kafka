@@ -1,0 +1,37 @@
+{
+	"info": {
+		"_postman_id": "8c8afeaf-c605-4528-be89-a7ad12880b7e",
+		"name": "Debezium",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Debezium",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"inventory-connector\",\r\n\"config\": {\r\n\"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\",\r\n\"database.hostname\": \"postgres\",\r\n\"database.port\": \"5432\",\r\n\"database.user\": \"postgres\",\r\n\"database.password\": \"postgres\",\r\n\"database.dbname\" : \"postgres\",\r\n\"database.server.name\": \"dbserver1\",\r\n\"table.include.list\": \"inventory.customers\"\r\n}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/connectors",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"connectors"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
